@@ -1,0 +1,47 @@
+Designs, builds, and deploys data-driven solutions that enable advanced analytics, automation, and process optimization for Texas Instruments’ Quality and Manufacturing organizations. Partners closely with TI quality engineers, factory teams, and business stakeholders to develop and operationalize data systems that drive improvements in product quality and customer satisfaction.
+
+Establishes scalable data flows, architectures, and software components to ingest, process, and manage structured and unstructured data across internal systems. Writes robust, maintainable Python code to build reusable libraries, APIs, and tools that support automation and insight generation. Applies artificial intelligence and machine learning techniques to support root cause analysis, predictive modeling, and smart data access.
+
+Implements best practices for data quality, integrity, and governance, ensuring compatibility and operability across TI’s infrastructure. Continuously evaluates and enhances data systems and business processes based on evolving technical requirements and user feedback. This role requires strong engineering fundamentals, hands-on development skills, and a mindset focused on delivering practical, scalable solutions to real business challenges.
+
+Texas Instruments will not sponsor job applicants for visas or work authorization for this position.
+
+Qualifications
+
+Minimum Requirements:
+
+Bachelor’s degree in Electrical Engineering, Computer Engineering, or a related technical field
+3 years of relevant professional experience in data engineering, software development, or business process automation in a semiconductor or related technology experience
+Proficiency in Python scripting, including building reusable functions and libraries for internal use
+Hands-on experience working with SQL and relational databases to retrieve, transform, and manage data
+Experience developing tools or solutions that support business process automation, data analytics, or customer quality workflows
+
+Preferred Qualifications
+
+Master’s degree in a related engineering or data-focused field
+Experience supporting semiconductor quality or manufacturing operations
+Familiarity with machine learning, AI integration, and large language models (LLMs) in practical applications
+Experience building internal tools or dashboards using platforms like Streamlit, Power BI, or equivalent
+Knowledge of TI’s internal data systems or previous collaboration with TI quality or factory teams
+Strong understanding of data architecture, ETL pipelines, and principles of data integrity and scalability
+Experience working with vector databases and implementing Retrieval-Augmented Generation (RAG) pipelines 
+
+About Us
+
+Why TI?
+
+Engineer your future. We empower our employees to truly own their career and development. Come collaborate with some of the smartest people in the world to shape the future of electronics.
+We're different by design. Diverse backgrounds and perspectives are what push innovation forward and what make TI stronger. We value each and every voice, and look forward to hearing yours. Meet the people of TI 
+Benefits that benefit you. We offer competitive pay and benefits designed to help you and your family live your best life. Your well-being is important to us.
+
+About Texas Instruments
+
+Texas Instruments Incorporated (Nasdaq: TXN) is a global semiconductor company that designs, manufactures and sells analog and embedded processing chips for markets such as industrial, automotive, personal electronics, communications equipment and enterprise systems. At our core, we have a passion to create a better world by making electronics more affordable through semiconductors. This passion is alive today as each generation of innovation builds upon the last to make our technology more reliable, more affordable and lower power, making it possible for semiconductors to go into electronics everywhere. Learn more at TI.com .
+
+Texas Instruments is an equal opportunity employer and supports a diverse, inclusive work environment. All qualified applicants will receive consideration for employment without regard to race, color, religion, creed, disability, genetic information, national origin, gender, gender identity and expression, age, sexual orientation, marital status, veteran status, or any other characteristic protected by federal, state, or local laws.
+
+If you are interested in this position, please apply to this requisition.
+
+About The Team
+
+TI does not make recruiting or hiring decisions based on citizenship, immigration status or national origin. However, if TI determines that information access or export control restrictions based upon applicable laws and regulations would prohibit you from working in this position without first obtaining an export license, TI expressly reserves the right not to seek such a license for you and either offer you a different position that does not require an export license or decline to move forward with your employment.

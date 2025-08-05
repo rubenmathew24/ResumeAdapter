@@ -1,0 +1,72 @@
+name: "John Smith"
+contact:
+  email: "john.smith@email.com"
+  phone: "(555) 123-4567"
+  location: "San Francisco, CA"
+  linkedin: "linkedin.com/in/johnsmith"
+  github: "github.com/johnsmith"
+
+professional_summary: "Software engineer with 5+ years of experience building scalable web applications. Passionate about clean code, system design, and delivering high-quality software solutions."
+
+skills:
+  - Python
+  - JavaScript
+  - React
+  - Node.js
+  - PostgreSQL
+  - MongoDB
+  - AWS
+  - Docker
+  - Git
+  - REST APIs
+  - GraphQL
+  - Machine Learning
+  - Data Analysis
+  - Agile/Scrum
+
+experience:
+  - company: "TechCorp Inc"
+    position: "Senior Software Engineer"
+    duration: "Jan 2022 - Present"
+    achievements:
+      - "Led development of microservices architecture serving 1M+ daily users"
+      - "Improved application performance by 40% through database optimization"
+      - "Mentored 3 junior developers and conducted code reviews"
+      - "Implemented CI/CD pipelines reducing deployment time by 60%"
+
+  - company: "StartupXYZ"
+    position: "Full Stack Developer"
+    duration: "Jun 2020 - Dec 2021"
+    achievements:
+      - "Built React-based dashboard handling real-time data visualization"
+      - "Developed REST APIs using Node.js and Express serving 10K+ requests/day"
+      - "Integrated third-party payment systems (Stripe, PayPal)"
+      - "Collaborated with design team to implement responsive UI components"
+
+  - company: "DataSolutions Ltd"
+    position: "Software Developer"
+    duration: "Aug 2019 - May 2020"
+    achievements:
+      - "Created data processing pipelines using Python and pandas"
+      - "Built machine learning models for customer behavior prediction"
+      - "Automated reporting processes saving 15 hours/week of manual work"
+      - "Maintained legacy PHP applications and migrated to modern stack"
+
+education:
+  - institution: "University of California, Berkeley"
+    degree: "Bachelor of Science"
+    field: "Computer Science"
+    graduation: "2019"
+
+projects:
+  - name: "E-commerce Platform"
+    description: "Full-stack web application with user authentication, payment processing, and admin dashboard"
+    technologies: ["React", "Node.js", "PostgreSQL", "Stripe API"]
+
+  - name: "Stock Price Predictor"
+    description: "Machine learning model to predict stock prices using historical data and technical indicators"
+    technologies: ["Python", "TensorFlow", "pandas", "scikit-learn"]
+
+  - name: "Task Management API"
+    description: "RESTful API for task management with user authentication and real-time updates"
+    technologies: ["Express.js", "MongoDB", "JWT", "Socket.io"]
