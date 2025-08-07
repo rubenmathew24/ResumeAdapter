@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-AI-Powered Resume Adapter MVP
-Simple script that takes user profile + job description and generates tailored PDF resume.
-"""
 
 import click
 import yaml
@@ -21,13 +17,6 @@ config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkh
 # Load environment variables
 load_dotenv()
 
-# Configure OpenAI
-openai.api_key = os.getenv("OPENAI_API_KEY")
-if not openai.api_key:
-    raise ValueError("Please set OPENAI_API_KEY environment variable")
-
-client = openai.OpenAI()
-
 def get_instructions():
     return """
     - Only include the most relevant experiences (max 4)
@@ -36,7 +25,7 @@ def get_instructions():
     - Rewrite project DESCRIPTIONS to use keywords from the job description
     - DON'T add anything to the project NAMES such as "Academic" or "Personal", or related skills.
     - Order everything by relevance to the job
-    - Keep it concise and ATS-friendly
+    - Keep it CONCISE and ATS-friendly
     - Use information from user profile to tailor the professional summary to the job
     - When listing technologies used or skiils, PLEASE Title Case them
     - DO NOT MAKE UP INFORMATION. If the information is not explicitly stated in the user profile or cannot be REASONABLY assumed based on information given, do not include it. I cannot stress this enough, if the skill isn't expclity stated, don't include it. if the course work isn't expclity stated don't include it.
@@ -45,21 +34,17 @@ def get_instructions():
     """
 
 def load_user_profile(profile_path):
-    """Load user profile from YAML or JSON file."""
     with open(profile_path, 'r', encoding='utf-8') as f:
         if profile_path.endswith('.yaml') or profile_path.endswith('.yml'):
             return yaml.safe_load(f)
         else:
             return json.load(f)
 
-
 def load_job_description(job_path):
-    """Load job description from text file."""
     with open(job_path, 'r', encoding='utf-8') as f:
         return f.read().strip()
 
 def get_json_structure(template):
-    """Load JSON structure from external file and return as formatted string"""
     structures_file = 'resume_structures.json'
     
     if not os.path.exists(structures_file):
@@ -75,13 +60,24 @@ def get_json_structure(template):
             
         # Convert the structure back to a formatted JSON string
         return json.dumps(structure, indent=4)
+    
     except json.JSONDecodeError:
         raise ValueError(f"Invalid JSON in '{structures_file}'")
     except Exception as e:
         raise Exception(f"Error reading structures file: {e}")
 
-def prompt_llm(prompt, model='local-gpt-oss'):
+def prompt_llm(prompt, model):
+    
+    # GPT-4 API Call
     if model == 'gpt-4':
+        
+        # Configure OpenAI
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        if not openai.api_key:
+            raise ValueError("Please set OPENAI_API_KEY environment variable")
+        client = openai.OpenAI()
+
+        # Call GPT-4
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
@@ -92,7 +88,11 @@ def prompt_llm(prompt, model='local-gpt-oss'):
             temperature=0.3
         )
         return response.choices[0].message.content
+    
+    # GPT-OSS Local LLM via Ollama
     elif model == 'local-gpt-oss':
+        
+        # Call Ollama
         response = requests.post(
             "http://localhost:11434/api/generate",
             json={
@@ -104,6 +104,7 @@ def prompt_llm(prompt, model='local-gpt-oss'):
         return response.json()["response"]
     
 def clean_response(response): 
+
     # Parse the JSON response from AI
     if isinstance(response, str):
         # Clean the response in case there's extra text around the JSON
@@ -121,7 +122,6 @@ def clean_response(response):
 
 
 def generate_prompt(user_profile, job_description, json_structure):
-    """Use OpenAI to tailor the resume content to the job."""
 
     prompt = f"""
     You are an expert resume writer. Given a user's profile and a job description, create a tailored resume by selecting and reordering the most relevant information.
@@ -141,8 +141,7 @@ def generate_prompt(user_profile, job_description, json_structure):
 
     return prompt
 
-def format_profile_as_resume(profile):
-    """Convert raw profile to resume format (fallback)."""
+def raw_profile_to_json(profile):
     return {
         "name": profile.get("name", ""),
         "contact": profile.get("contact", {}),
@@ -155,7 +154,6 @@ def format_profile_as_resume(profile):
 
 
 def generate_html_resume(resume_data, template):
-    """Generate HTML resume from template file."""
     template_path = Path(f"templates/{template}")
     
     if not template_path.exists():
@@ -169,7 +167,6 @@ def generate_html_resume(resume_data, template):
 
 
 def generate_pdf(html_content, output_path):
-    """Generate PDF from HTML content using pdfkit."""
     try:
         # Configure pdfkit options for better output
         options = {
@@ -205,9 +202,9 @@ def generate_pdf(html_content, output_path):
 @click.option('--job', '-j', required=True, help='Path to job description text file')
 @click.option('--output', '-o', required=True, help='Output path for generated PDF resume')
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose output')
-@click.option('--template', '-t', default='education_template.html', help='Path to HTML template file')
-def main(profile, job, output, verbose, template):
-    """Generate a tailored resume PDF from user profile and job description."""
+@click.option('--template', '-t', default='experience_template.html', help='Path to HTML template file')
+@click.option('--model', '-m', default='local-gpt-oss', help='LLM model to use')
+def main(profile, job, output, verbose, template, model):
     
     try:
         # Ensure output directory exists
@@ -240,7 +237,7 @@ def main(profile, job, output, verbose, template):
         try:
             if verbose:
                 click.echo("🤖 Requesting LLM...")
-            ai_response = prompt_llm(prompt)
+            ai_response = prompt_llm(prompt, model)
             tailored_resume = clean_response(ai_response)
             
             if verbose:
@@ -249,7 +246,7 @@ def main(profile, job, output, verbose, template):
         except Exception as e:
             print(f"Error tailoring resume: {e}")
             # Fallback: return original profile in expected format
-            tailored_resume = format_profile_as_resume(user_profile)
+            tailored_resume = raw_profile_to_json(user_profile)
             if verbose:
                 click.echo("⚠️ Using fallback resume format")
 
