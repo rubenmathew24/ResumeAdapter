@@ -13,6 +13,7 @@ from jinja2 import Template
 import pdfkit
 import openai
 from dotenv import load_dotenv
+import requests
 
 config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
 
@@ -79,7 +80,47 @@ def get_json_structure(template):
     except Exception as e:
         raise Exception(f"Error reading structures file: {e}")
 
-def tailor_resume_with_llm(user_profile, job_description, json_structure):
+def prompt_llm(prompt, model='local-gpt-oss'):
+    if model == 'gpt-4':
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are an expert resume writer. Always respond with valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=2000,
+            temperature=0.3
+        )
+        return response.choices[0].message.content
+    elif model == 'local-gpt-oss':
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "gpt-oss:20b",
+                "prompt": prompt,
+                "stream": False
+            }
+        )
+        return response.json()["response"]
+    
+def clean_response(response): 
+    # Parse the JSON response from AI
+    if isinstance(response, str):
+        # Clean the response in case there's extra text around the JSON
+        response = response.strip()
+        if response.startswith('```json'):
+            response = response[7:]  # Remove ```json
+        if response.endswith('```'):
+            response = response[:-3]  # Remove ```
+        
+        cleaned_response = json.loads(response)
+    else:
+        cleaned_response = response
+
+    return cleaned_response
+
+
+def generate_prompt(user_profile, job_description, json_structure):
     """Use OpenAI to tailor the resume content to the job."""
 
     prompt = f"""
@@ -98,30 +139,7 @@ def tailor_resume_with_llm(user_profile, job_description, json_structure):
     {get_instructions()}
     """
 
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are an expert resume writer. Always respond with valid JSON only."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=2000,
-            temperature=0.3
-        )
-        
-        response_text = response.choices[0].message.content.strip()
-        
-        # Clean up JSON if wrapped in markdown
-        if response_text.startswith('```json'):
-            response_text = response_text.replace('```json', '').replace('```', '').strip()
-        
-        return json.loads(response_text)
-    
-    except Exception as e:
-        print(f"Error calling OpenAI: {e}")
-        # Fallback: return original profile in expected format
-        return format_profile_as_resume(user_profile)
-
+    return prompt
 
 def format_profile_as_resume(profile):
     """Convert raw profile to resume format (fallback)."""
@@ -208,7 +226,7 @@ def main(profile, job, output, verbose, template):
         job_description = load_job_description(job)
         
         if verbose:
-            click.echo(f" Getting JSON structure from {template}")
+            click.echo(f"🏗️ Getting JSON structure from {template}")
         json_structure = get_json_structure(template)
         if not json_structure:
             click.echo(f"❌ Failed to get JSON structure from {template}", err=True)
@@ -216,9 +234,25 @@ def main(profile, job, output, verbose, template):
 
         # Tailor resume with LLM
         if verbose:
-            click.echo("🤖 Tailoring resume with AI...")
-        tailored_resume = tailor_resume_with_llm(user_profile, job_description, json_structure)
+            click.echo("🤖 Generating Prompt for AI...")
+        prompt = generate_prompt(user_profile, job_description, json_structure)
         
+        try:
+            if verbose:
+                click.echo("🤖 Requesting LLM...")
+            ai_response = prompt_llm(prompt)
+            tailored_resume = clean_response(ai_response)
+            
+            if verbose:
+                click.echo("✅ Successfully parsed AI response")
+
+        except Exception as e:
+            print(f"Error tailoring resume: {e}")
+            # Fallback: return original profile in expected format
+            tailored_resume = format_profile_as_resume(user_profile)
+            if verbose:
+                click.echo("⚠️ Using fallback resume format")
+
         # Generate HTML
         if verbose:
             click.echo("📄 Generating HTML resume...")
