@@ -1,0 +1,94 @@
+{
+  "education_template.html": {
+    "name": "Full Name",
+    "contact": {
+      "email": "email@example.com",
+      "phone": "phone number",
+      "location": "city, state",
+      "linkedin": "linkedin url",
+      "github": "github url"
+    },
+    "professional_summary": "2-3 sentence summary tailored to this job",
+    "education": [
+      {
+        "institution": "School Name",
+        "degree": "Degree Type",
+        "field": "Field of Study",
+        "graduation": "Year",
+        "location": "City, State",
+        "gpa": "3.XX",
+        "honors": "Academic Excellence Scholarship Recipient"
+      }
+    ],
+    "relevant_courses": ["Course 1", "Course 2", "Course 3", "..."],
+    "skills": ["skill1", "skill2", "skill3", "..."],
+    "experience": [
+      {
+        "company": "Company Name",
+        "position": "Job Title",
+        "duration": "Start - End Date",
+        "location": "City, State",
+        "achievements": ["achievement 1", "achievement 2", "..."]
+      }
+    ],
+    "academic_projects": [
+      {
+        "name": "Project Name",
+        "course": "Course Name",
+        "duration": "Semester Year",
+        "description": "Brief description of the project",
+        "technologies": ["tech1", "tech2"]
+      }
+    ],
+    "personal_projects": [
+      {
+        "name": "Project Name",
+        "duration": "Year or Date Range",
+        "description": "Brief description of the project",
+        "technologies": ["tech1", "tech2"]
+      }
+    ],
+    "activities": [
+      {
+        "name": "Activity Name",
+        "duration": "Date Range",
+        "description": "Brief description (optional)"
+      }
+    ]
+  },
+  "experience_template.html": {
+    "name": "Full Name",
+    "contact": {
+      "email": "email@example.com",
+      "phone": "phone number",
+      "location": "city, state",
+      "linkedin": "linkedin url",
+      "github": "github url"
+    },
+    "professional_summary": "2-3 sentence summary tailored to this job",
+    "skills": ["skill1", "skill2", "skill3", "..."],
+    "experience": [
+      {
+        "company": "Company Name",
+        "position": "Job Title",
+        "duration": "Start - End Date",
+        "achievements": ["achievement 1", "achievement 2", "..."]
+      }
+    ],
+    "education": [
+      {
+        "institution": "School Name",
+        "degree": "Degree Type",
+        "field": "Field of Study",
+        "graduation": "Year"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Project Name",
+        "description": "Brief description",
+        "technologies": ["tech1", "tech2"]
+      }
+    ]
+  }
+}

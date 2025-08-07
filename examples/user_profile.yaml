@@ -57,16 +57,28 @@ education:
     degree: "Bachelor of Science"
     field: "Computer Science"
     graduation: "2019"
+    gpa: "3.86"
+    courses: 
+      - "Database Systems"
+      - "Data Structures and Algorithms"
+      - "Operating Systems"
+      - "Software Engineering"
+      - "Computer Networks"
+      - "Artificial Intelligence"
+
 
 projects:
   - name: "E-commerce Platform"
     description: "Full-stack web application with user authentication, payment processing, and admin dashboard"
     technologies: ["React", "Node.js", "PostgreSQL", "Stripe API"]
+    duration: "Jan 2022 - Present"
 
   - name: "Stock Price Predictor"
     description: "Machine learning model to predict stock prices using historical data and technical indicators"
     technologies: ["Python", "TensorFlow", "pandas", "scikit-learn"]
+    duration: "Aug 2021 - Dec 2021"
 
   - name: "Task Management API"
     description: "RESTful API for task management with user authentication and real-time updates"
     technologies: ["Express.js", "MongoDB", "JWT", "Socket.io"]
+    duration: "May 2021 - Aug 2021"

@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 ruben/
 copy-paste-commands.txt
+output/
 
 # C extensions
 *.so

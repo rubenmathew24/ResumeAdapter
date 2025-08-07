@@ -27,6 +27,21 @@ if not openai.api_key:
 
 client = openai.OpenAI()
 
+def get_instructions():
+    return """
+    - Only include the most relevant experiences (max 4)
+    - Prioritize skills that match the job requirements (min 5, max 7)
+    - Rewrite achievements to use keywords from the job description
+    - Rewrite project DESCRIPTIONS to use keywords from the job description
+    - DON'T add anything to the project NAMES such as "Academic" or "Personal", or related skills.
+    - Order everything by relevance to the job
+    - Keep it concise and ATS-friendly
+    - Use information from user profile to tailor the professional summary to the job
+    - When listing technologies used or skiils, PLEASE Title Case them
+    - DO NOT MAKE UP INFORMATION. If the information is not explicitly stated in the user profile or cannot be REASONABLY assumed based on information given, do not include it. I cannot stress this enough, if the skill isn't expclity stated, don't include it. if the course work isn't expclity stated don't include it.
+    - DO NOT USE THE EXACT WORDS GIVEN IN THE EXPERIENCE OR PROJECT DESCRIPTIONS OF USER PROFILE. Make sure to rewrite them to be professional and appeasing to a potential recruiter.
+    - NEVER EVER USE THE WORD "PASSIONATE".
+    """
 
 def load_user_profile(profile_path):
     """Load user profile from YAML or JSON file."""
@@ -42,65 +57,46 @@ def load_job_description(job_path):
     with open(job_path, 'r', encoding='utf-8') as f:
         return f.read().strip()
 
-
-def tailor_resume_with_llm(user_profile, job_description):
-    """Use OpenAI to tailor the resume content to the job."""
+def get_json_structure(template):
+    """Load JSON structure from external file and return as formatted string"""
+    structures_file = 'resume_structures.json'
     
+    if not os.path.exists(structures_file):
+        raise FileNotFoundError(f"Structures file '{structures_file}' not found")
+    
+    try:
+        with open(structures_file, 'r') as f:
+            structures = json.load(f)
+        
+        structure = structures.get(template, None)
+        if structure is None:
+            return None
+            
+        # Convert the structure back to a formatted JSON string
+        return json.dumps(structure, indent=4)
+    except json.JSONDecodeError:
+        raise ValueError(f"Invalid JSON in '{structures_file}'")
+    except Exception as e:
+        raise Exception(f"Error reading structures file: {e}")
+
+def tailor_resume_with_llm(user_profile, job_description, json_structure):
+    """Use OpenAI to tailor the resume content to the job."""
+
     prompt = f"""
-You are an expert resume writer. Given a user's profile and a job description, create a tailored resume by selecting and reordering the most relevant information.
-Do not use all the information in the user's profile. If the skills, experience, or education do not pertain to the job, leave them out. Only include irrelevant information if there is not enough content.
-USER PROFILE:
-{json.dumps(user_profile, indent=2)}
+    You are an expert resume writer. Given a user's profile and a job description, create a tailored resume by selecting and reordering the most relevant information.
+    Do not use all the information in the user's profile. If the skills, experience, or education do not pertain to the job, leave them out. Only include irrelevant information if there is not enough content.
+    USER PROFILE:
+    {json.dumps(user_profile, indent=2)}
 
-JOB DESCRIPTION:
-{job_description}
+    JOB DESCRIPTION:
+    {job_description}
 
-Please return a JSON object with the tailored resume content using this structure:
-{{
-    "name": "Full Name",
-    "contact": {{
-        "email": "email@example.com",
-        "phone": "phone number",
-        "location": "city, state",
-        "linkedin": "linkedin url",
-        "github": "github url"
-    }},
-    "professional_summary": "2-3 sentence summary tailored to this job",
-    "skills": ["skill1", "skill2", "skill3", ...],
-    "experience": [
-        {{
-            "company": "Company Name",
-            "position": "Job Title",
-            "duration": "Start - End Date",
-            "achievements": ["achievement 1", "achievement 2", ...]
-        }}
-    ],
-    "education": [
-        {{
-            "institution": "School Name",
-            "degree": "Degree Type",
-            "field": "Field of Study",
-            "graduation": "Year"
-        }}
-    ],
-    "projects": [
-        {{
-            "name": "Project Name",
-            "description": "Brief description",
-            "technologies": ["tech1", "tech2"]
-        }}
-    ]
-}}
+    Please return a JSON object with the tailored resume content using this structure:
+    {json_structure}
 
-Instructions:
-- Only include the most relevant experiences (max 4)
-- Prioritize skills that match the job requirements
-- Rewrite achievements to use keywords from the job description
-- Rewrite project descriptions to use keywords from the job description
-- Order everything by relevance to the job
-- Keep it concise and ATS-friendly
-- Use information from user profile to tailor the professional summary to the job
-"""
+    Instructions:
+    {get_instructions()}
+    """
 
     try:
         response = client.chat.completions.create(
@@ -120,7 +116,7 @@ Instructions:
             response_text = response_text.replace('```json', '').replace('```', '').strip()
         
         return json.loads(response_text)
-        
+    
     except Exception as e:
         print(f"Error calling OpenAI: {e}")
         # Fallback: return original profile in expected format
@@ -140,9 +136,9 @@ def format_profile_as_resume(profile):
     }
 
 
-def generate_html_resume(resume_data):
+def generate_html_resume(resume_data, template):
     """Generate HTML resume from template file."""
-    template_path = Path("templates/resume_template.html")
+    template_path = Path(f"templates/{template}")
     
     if not template_path.exists():
         raise FileNotFoundError(f"Template file not found: {template_path}")
@@ -191,7 +187,8 @@ def generate_pdf(html_content, output_path):
 @click.option('--job', '-j', required=True, help='Path to job description text file')
 @click.option('--output', '-o', required=True, help='Output path for generated PDF resume')
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose output')
-def main(profile, job, output, verbose):
+@click.option('--template', '-t', default='education_template.html', help='Path to HTML template file')
+def main(profile, job, output, verbose, template):
     """Generate a tailored resume PDF from user profile and job description."""
     
     try:
@@ -210,15 +207,22 @@ def main(profile, job, output, verbose):
             click.echo(f"📋 Loading job description from {job}")
         job_description = load_job_description(job)
         
+        if verbose:
+            click.echo(f" Getting JSON structure from {template}")
+        json_structure = get_json_structure(template)
+        if not json_structure:
+            click.echo(f"❌ Failed to get JSON structure from {template}", err=True)
+            return
+
         # Tailor resume with LLM
         if verbose:
             click.echo("🤖 Tailoring resume with AI...")
-        tailored_resume = tailor_resume_with_llm(user_profile, job_description)
+        tailored_resume = tailor_resume_with_llm(user_profile, job_description, json_structure)
         
         # Generate HTML
         if verbose:
             click.echo("📄 Generating HTML resume...")
-        html_content = generate_html_resume(tailored_resume)
+        html_content = generate_html_resume(tailored_resume, template)
         
         # Generate PDF
         if verbose:
